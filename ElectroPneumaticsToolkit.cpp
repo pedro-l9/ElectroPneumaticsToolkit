@@ -51,60 +51,53 @@ void AtuadorDigital::atuar(){
 
 Bancada::Bancada(){
 	qtdAtuadores = 0;
-	qtdEventos = 0;	
+	/*qtdEventos = 0;	*/
 }
 
 void Bancada::adicionaAtuador(Atuador* atuador){
-	atuadores[qtdAtuadores].nome = atuador->nome;
-	atuadores[qtdAtuadores].porta = atuador->porta;
-	atuadores[qtdAtuadores].estadoAtual = atuador->estadoAtual;
-	atuadores[qtdAtuadores].estadoDesejado = atuador->estadoDesejado;
-	atuadores[qtdAtuadores].tempoAtuacao = atuador->tempoAtuacao;
+	atuadores[qtdAtuadores] = atuador;
 	qtdAtuadores++;
 }
 
-void Bancada::adicionaEvento(Atuador* atuador, int porta, bool estadoDesejadoDaPorta){
+/*void Bancada::adicionaEvento(Atuador* atuador, int porta, bool estadoDesejadoDaPorta){
 	eventos[qtdEventos].atuador = atuador;
 	eventos[qtdEventos].porta = porta;
 	eventos[qtdEventos].estadoDesejadoDaPorta = estadoDesejadoDaPorta;
 	qtdAtuadores++;
-}
+}*/
 
 int Bancada::getAtuadorIdByName(String nome){
 	for(int i = 0; i < qtdAtuadores; i++){
-		if(atuadores[i].nome == nome) return i;
+		if(atuadores[i]->nome == nome) return i;
 	}
 	return -1;
 }
 
-int Bancada::getEventoIdByPorta(int porta){
+/*int Bancada::getEventoIdByPorta(int porta){
 	for(int i = 0; i < qtdAtuadores; i++){
 		if(eventos[i].porta == porta) return i;
 	}
 	return -1;
-}
+}*/
 
-int Bancada::getEventoIdByName(String nome){
+/*int Bancada::getEventoIdByName(String nome){
 	for(int i = 0; i < qtdAtuadores; i++){
 		if(eventos[i].nome == nome) return i;
 	}
 	return -1;
-}
+}*/
 
 void Bancada::removeAtuador(String nome){
 	int idAtuadorRemovido = getAtuadorIdByName(nome);
 
 	if(idAtuadorRemovido != -1){
-		atuadores[idAtuadorRemovido].nome = atuadores[qtdAtuadores-1].nome;
-		atuadores[idAtuadorRemovido].porta = atuadores[qtdAtuadores-1].porta;
-		atuadores[idAtuadorRemovido].estadoAtual = atuadores[qtdAtuadores-1].estadoAtual;
-		atuadores[idAtuadorRemovido].estadoDesejado = atuadores[qtdAtuadores-1].estadoDesejado;
-		atuadores[idAtuadorRemovido].tempoAtuacao = atuadores[qtdAtuadores-1].tempoAtuacao;
+		delete atuadores[idAtuadorRemovido];
+		atuadores[idAtuadorRemovido] = atuadores[qtdAtuadores-1];
 		qtdAtuadores--;
 	}
 }
 
-void Bancada::removeEvento(int porta){
+/*void Bancada::removeEvento(int porta){
 	int idEventoRemovido = getEventoIdByPorta(porta);
 
 	if(idEventoRemovido != -1){
@@ -113,10 +106,10 @@ void Bancada::removeEvento(int porta){
 		eventos[idEventoRemovido].estadoDesejadoDaPorta = eventos[qtdEventos-1].estadoDesejadoDaPorta;
 		qtdEventos--;
 	}
-}
+}*/
 
 void Bancada::atuar(String nomeAtuador, int estadoDesejado){
-	Atuador* atuador = &(atuadores[getAtuadorIdByName(nomeAtuador)]);
+	Atuador* atuador = atuadores[getAtuadorIdByName(nomeAtuador)];
 	
 
 	Serial.println("Atuando " + atuador->nome);	
@@ -132,7 +125,7 @@ void Bancada::atuar(String nomeAtuador, int estadoDesejado){
 	
 }
 
-void Bancada::atuar(String nomeEvento){
+/*void Bancada::atuar(String nomeEvento){
 	Evento* evento = &eventos[getEventoIdByName(nomeEvento)];
 	
 	if((evento->estadoDesejadoDaPorta != 0) != evento->atuador->estadoAtual){
@@ -140,11 +133,11 @@ void Bancada::atuar(String nomeEvento){
 		while(digitalRead(evento->porta) != evento->estadoDesejadoDaPorta);
 		evento->atuador->estadoAtual = !evento->atuador->estadoAtual;
 	}
-}
+}*/
 
 void Bancada::listaAtuadores(){
 	Serial.print("Lista de Atuadores: ");
 	for(int i = 0; i < qtdAtuadores; i++){
-		Serial.print(atuadores[i].nome + (i < qtdAtuadores -1 ? "," : ";\n\n"));
+		Serial.print(atuadores[i]->nome + (i < qtdAtuadores -1 ? "," : ";\n\n"));
 	}
 }
