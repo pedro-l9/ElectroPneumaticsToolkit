@@ -1,28 +1,10 @@
 #include "ElectroPneumaticsToolkit.h"
-  	
-Atuador::Atuador(){
-	nome = "";
-	porta = -1;
-	estadoAtual = 0;
-	estadoDesejado = 0;
-	tempoAtuacao = 0;
-}
 
 Atuador::Atuador(String _nome, int _porta, bool _estadoAtual, int _tempoAtuacao){
 	nome = _nome;
 	porta = _porta;
 	estadoAtual = _estadoAtual;
-	estadoDesejado = _estadoAtual;
 	tempoAtuacao = _tempoAtuacao;
-}
-
-void Atuador::atuar(){
-	Serial.println("Método virtual");
-}
-
-Servo::Servo() 
-: Atuador(){
-	
 }
 
 Servo::Servo(String _nome, int _porta, bool _estadoAtual, int _tempoAtuacao) 
@@ -34,9 +16,9 @@ void Servo::atuar(){
 	Serial.println("Atuando Servo");
 }
 
-AtuadorDigital::AtuadorDigital() 
-: Atuador(){
-
+void Servo::atuar(boolean estado){ 
+	Serial.print("Atuando Servo para ");
+	Serial.println(estado ? "+" : "-");
 }
 
 AtuadorDigital::AtuadorDigital(String _nome, int _porta, bool _estadoAtual, int _tempoAtuacao) 
@@ -46,11 +28,23 @@ AtuadorDigital::AtuadorDigital(String _nome, int _porta, bool _estadoAtual, int 
   		estadoAtual = _estadoAtual;
   		tempoAtuacao = _tempoAtuacao;
 
-  		digitalWrite(porta, estadoAtual);
+  		if(porta >= 0 && porta <= 13) {
+  			pinMode(porta, OUTPUT);
+  			atuar(estadoAtual);
+  		}else{
+  			Serial.println("Erro ao alocar porta do atuador " + nome);
+  			porta = -1;
+  		}
 }
 
 void AtuadorDigital::atuar(){
+	atuar(!estadoAtual);
+}
+
+void AtuadorDigital::atuar(boolean estado){
+	estadoAtual = estado;
 	digitalWrite(porta, estadoAtual);
+	delay(tempoAtuacao);
 }
 
 Bancada::Bancada(){
@@ -58,9 +52,11 @@ Bancada::Bancada(){
 }
 
 void Bancada::adicionaAtuador(Atuador* atuador){
-	atuadores[qtdAtuadores] = atuador;
-	Serial.println("Adicionando " + atuador->nome);
-	qtdAtuadores++;
+	if(atuador->porta >=0){
+		atuadores[qtdAtuadores] = atuador;
+		Serial.println("Adicionado " + atuador->nome);
+		qtdAtuadores++;	
+	}
 }
 
 int Bancada::getAtuadorIdByName(String nome){
@@ -82,17 +78,22 @@ void Bancada::removeAtuador(String nome){
 
 void Bancada::atuar(String nomeAtuador, int estadoDesejado){
 	Atuador* atuador = atuadores[getAtuadorIdByName(nomeAtuador)];
-	
 
 	Serial.println("Atuando " + atuador->nome);	
-	if((estadoDesejado != 0) != atuador->estadoAtual){
 
-		atuador->estadoAtual = !atuador->estadoAtual;
-		atuador->atuar();
-		delay(atuador->tempoAtuacao);
+	atuador->atuar(estadoDesejado == 1);
 
-		Serial.println(nomeAtuador + " Atuado");
-	}
+	Serial.println(nomeAtuador + " Atuado");
+}
+
+void Bancada::executaExpression(Expression *expr, int repeticoes){
+	do{
+    	for(int i = 0; i < expr->termCount; i++){
+    		Term term = expr->terms[i];
+    		atuar(term.name, term.state);
+    	}
+		repeticoes--;
+	}while(repeticoes > 0);
 }
 
 void Bancada::listaAtuadores(){

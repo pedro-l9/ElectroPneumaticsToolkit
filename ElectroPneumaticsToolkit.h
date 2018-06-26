@@ -4,36 +4,35 @@
 #define NRO_MAX_EVENTOS 13
  
 #include <Arduino.h>
+#include <CommandParser.h>
 
 class Atuador{
   public:
   	String nome;
   	int porta;
   	bool estadoAtual;
-  	bool estadoDesejado;
   	int tempoAtuacao;
-
-  	Atuador();
 
   	Atuador(String _nome, int _porta, bool _estadoAtual, int _tempoAtuacao);
 
-  	virtual void atuar();
+  	virtual void atuar() =0;
+    virtual void atuar(boolean estado) =0;
 };
 
 class Servo: public Atuador{
   public:
-  	Servo();
   	Servo(String _nome, int _porta, bool _estadoAtual, int _tempoAtuacao);
 
   	void atuar();
+    void atuar(boolean estado);
 };
 
 class AtuadorDigital: public Atuador{
   public:
-  	AtuadorDigital();
   	AtuadorDigital(String _nome, int _porta, bool _estadoAtual, int _tempoAtuacao);
 
   	void atuar();
+    void atuar(boolean estado);
 };
 
 class Bancada{
@@ -48,6 +47,7 @@ class Bancada{
   int getAtuadorIdByName(String nome);
   void removeAtuador(String nome);
   void atuar(String nomeAtuador, int estadoDesejado);
+  void executaExpression(Expression *expr, int repeticoes);
   void listaAtuadores();
 };
 
