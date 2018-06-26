@@ -36,33 +36,18 @@ class AtuadorDigital: public Atuador{
   	void atuar();
 };
 
-/*class Evento{
-  public:
-    String nome;
-	Atuador* atuador;
-	int porta;
-	bool estadoDesejadoDaPorta;
-};*/
-
 class Bancada{
     Atuador *atuadores[NRO_MAX_ATUADORES];
-    /*Evento eventos[NRO_MAX_EVENTOS];*/
 
     int qtdAtuadores;
-    /*int qtdEventos; */
 
   public:
 	Bancada();
 
-	//void adicionaEvento(Atuador* atuador, int porta, bool estadoDesejadoDaPorta);
-  //int getEventoIdByName(String nome);
-  //int getEventoIdByPorta(int porta);
-  //void removeEvento(int porta);
   void adicionaAtuador(Atuador* atuador);;
   int getAtuadorIdByName(String nome);
   void removeAtuador(String nome);
   void atuar(String nomeAtuador, int estadoDesejado);
-  /*void atuar(String nomeEvento);*/
   void listaAtuadores();
 };
 
